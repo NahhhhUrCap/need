@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDA Triumph Track | Student Achievements</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        :root { font-family: 'Inter', sans-serif; }
+        /* Custom styles for animations and shadows */
+        .achievement-card {
+            transition: all 0.3s ease;
+            transform: scale(1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .achievement-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.5), 0 4px 6px -4px rgba(59, 130, 246, 0.5);
+        }
+        .admin-message {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+
+    <!-- Global App Shell -->
+    <div id="app" class="max-w-7xl mx-auto p-4 md:p-8">
+
+        <!-- Header and Navigation -->
+        <header class="mb-8 border-b border-indigo-700 pb-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <h1 class="text-4xl font-extrabold text-yellow-400 tracking-wider mb-4 md:mb-0">
+                    🏆 TRIUMPH TRACK <span class="text-lg text-gray-400">| KDA</span>
+                </h1>
+                <nav class="flex space-x-4">
+                    <button onclick="showView('home')" class="nav-btn transition duration-300 hover:text-yellow-400">Momentum Feed</button>
+                    <button onclick="showView('gallery')" class="nav-btn transition duration-300 hover:text-yellow-400">Victory Vault</button>
+                    <button onclick="showView('news')" class="nav-btn transition duration-300 hover:text-yellow-400">Global Stage</button>
+                    <button onclick="showView('admin')" class="nav-btn bg-indigo-600 px-3 py-1 rounded-full hover:bg-indigo-700 transition duration-300 text-sm font-semibold">Admin Panel</button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Search and Filter Section (Visible on Home) -->
+        <section id="filter-section" class="mb-8 bg-gray-800 p-5 rounded-xl shadow-lg">
+            <div class="flex flex-col lg:flex-row lg:space-x-4">
+                <!-- Search Input -->
+                <div class="flex-grow mb-4 lg:mb-0">
+                    <input type="text" id="searchInput" oninput="filterAndSearch()" placeholder="Search by name, category, or keyword..."
+                           class="w-full bg-gray-700 text-white p-3 rounded-xl border border-indigo-500 focus:border-yellow-400 focus:ring focus:ring-yellow-400/50 transition duration-200">
+                </div>
+                <!-- Filter Buttons -->
+                <div class="flex flex-wrap gap-2">
+                    <button data-filter="" onclick="setFilter(this)" class="filter-btn bg-indigo-600 hover:bg-indigo-700 active-filter">All Achievements</button>
+                    <button data-filter="Academic" onclick="setFilter(this)" class="filter-btn bg-blue-600 hover:bg-blue-700">Academic</button>
+                    <button data-filter="Sports" onclick="setFilter(this)" class="filter-btn bg-green-600 hover:bg-green-700">Sports</button>
+                    <button data-filter="Arts" onclick="setFilter(this)" class="filter-btn bg-orange-600 hover:bg-orange-700">Arts</button>
+                    <button data-filter="Leadership" onclick="setFilter(this)" class="filter-btn bg-purple-600 hover:bg-purple-700">Leadership</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- --- 1. The Achievement Page: "The Momentum Feed" (HOME VIEW) --- -->
+        <main id="home-view" class="view">
+            <h2 class="text-3xl font-bold mb-6 text-indigo-400">The Momentum Feed</h2>
+            <p class="text-gray-400 mb-8">Celebrating the recent triumphs and hard work of the KDA student body.</p>
+
+            <!-- Featured Achievement Banner -->
+            <div class="bg-gradient-to-r from-yellow-500 to-amber-700 p-6 rounded-2xl mb-8 shadow-2xl animate-pulse">
+                <p class="text-sm font-semibold text-gray-900 uppercase">Featured Triumph of the Week</p>
+                <h3 class="text-2xl md:text-3xl font-extrabold text-white">Sarah Chen wins National Robotics Championship!</h3>
+                <p class="text-gray-900 mt-2">Check out her profile for the full story and project details.</p>
+                <button onclick="viewStudentProfile(101)" class="mt-4 bg-gray-900 text-yellow-400 py-2 px-4 rounded-full text-sm font-semibold hover:bg-gray-800 transition">View Profile & Story</button>
+            </div>
+
+            <!-- Achievement Grid -->
+            <div id="achievementGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Achievement Cards will be injected here by JavaScript -->
+            </div>
+        </main>
+
+        <!-- --- 2. Student Profiles: "The Hall of Honor" (PROFILE VIEW) --- -->
+        <main id="profile-view" class="view hidden">
+            <button onclick="showView('home')" class="text-indigo-400 hover:text-indigo-300 flex items-center mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Back to Feed
+            </button>
+            <div id="profileContent" class="bg-gray-800 p-8 rounded-2xl shadow-xl">
+                <!-- Profile data will be injected here -->
+            </div>
+        </main>
+
+        <!-- --- 3. Photo and Video Gallery: "The Victory Vault" (GALLERY VIEW) --- -->
+        <main id="gallery-view" class="view hidden">
+            <h2 class="text-3xl font-bold mb-6 text-indigo-400">The Victory Vault</h2>
+            <p class="text-gray-400 mb-8">Photos and videos capturing the moments of triumph. Filter by achievement type below!</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Simulate 8 Gallery Items (using placeholders for visual structure) -->
+                <div class="bg-gray-700 h-40 rounded-xl overflow-hidden relative group">
+                    <img src="https://placehold.co/400x300/4f46e5/ffffff?text=Robotics+Win" onerror="this.src='https://placehold.co/400x300/4f46e5/ffffff?text=Robotics+Win'" alt="Gallery item" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <span class="absolute bottom-2 left-2 text-xs bg-black bg-opacity-50 px-2 py-1 rounded-full">Academic</span>
+                </div>
+                <div class="bg-gray-700 h-40 rounded-xl overflow-hidden relative group">
+                    <img src="https://placehold.co/400x300/10b981/ffffff?text=Basketball+Champions" onerror="this.src='https://placehold.co/400x300/10b981/ffffff?text=Basketball+Champions'" alt="Gallery item" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <span class="absolute bottom-2 left-2 text-xs bg-black bg-opacity-50 px-2 py-1 rounded-full">Sports</span>
+                </div>
+                <div class="bg-gray-700 h-40 rounded-xl overflow-hidden relative group">
+                    <img src="https://placehold.co/400x300/f97316/ffffff?text=Art+Showcase+Winner" onerror="this.src='https://placehold.co/400x300/f97316/ffffff?text=Art+Showcase+Winner'" alt="Gallery item" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <span class="absolute bottom-2 left-2 text-xs bg-black bg-opacity-50 px-2 py-1 rounded-full">Arts</span>
+                </div>
+                <div class="bg-gray-700 h-40 rounded-xl overflow-hidden relative group">
+                    <img src="https://placehold.co/400x300/a855f7/ffffff?text=Student+Council" onerror="this.src='https://placehold.co/400x300/a855f7/ffffff?text=Student+Council'" alt="Gallery item" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <span class="absolute bottom-2 left-2 text-xs bg-black bg-opacity-50 px-2 py-1 rounded-full">Leadership</span>
+                </div>
+                <div class="bg-gray-700 h-40 rounded-xl overflow-hidden relative group">
+                    <img src="https://placehold.co/400x300/6b7280/ffffff?text=Drama+Club" onerror="this.src='https://placehold.co/400x300/6b7280/ffffff?text=Drama+Club'" alt="Gallery item" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <span class="absolute bottom-2 left-2 text-xs bg-black bg-opacity-50 px-2 py-1 rounded-full">Arts</span>
+                </div>
+                <div class="bg-gray-700 h-40 rounded-xl overflow-hidden relative group">
+                    <img src="https://placehold.co/400x300/a855f7/ffffff?text=Debate+Team" onerror="this.src='https://placehold.co/400x300/a855f7/ffffff?text=Debate+Team'" alt="Gallery item" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <span class="absolute bottom-2 left-2 text-xs bg-black bg-opacity-50 px-2 py-1 rounded-full">Academic</span>
+                </div>
+                <div class="bg-gray-700 h-40 rounded-xl overflow-hidden relative group">
+                    <img src="https://placehold.co/400x300/10b981/ffffff?text=Soccer+Goal" onerror="this.src='https://placehold.co/400x300/10b981/ffffff?text=Soccer+Goal'" alt="Gallery item" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <span class="absolute bottom-2 left-2 text-xs bg-black bg-opacity-50 px-2 py-1 rounded-full">Sports</span>
+                </div>
+                <div class="bg-gray-700 h-40 rounded-xl overflow-hidden relative group">
+                    <img src="https://placehold.co/400x300/4f46e5/ffffff?text=Math+Olympiad" onerror="this.src='https://placehold.co/400x300/4f46e5/ffffff?text=Math+Olympiad'" alt="Gallery item" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <span class="absolute bottom-2 left-2 text-xs bg-black bg-opacity-50 px-2 py-1 rounded-full">Academic</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- --- 4. News and Updates: "The KDA Global Stage" (NEWS VIEW) --- -->
+        <main id="news-view" class="view hidden">
+            <h2 class="text-3xl font-bold mb-6 text-indigo-400">The KDA Global Stage</h2>
+            <p class="text-gray-400 mb-8">Promoting KDA's excellence and connecting achievements to real-world impact.</p>
+            <div class="space-y-6">
+                <div class="bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-yellow-400">
+                    <h3 class="text-xl font-semibold mb-2">Alumni Spotlight: Triumph Track Success Leads to Harvard Acceptance</h3>
+                    <p class="text-gray-400 text-sm">October 21, 2025</p>
+                    <p class="mt-3">Former KDA student, Alex Johnson, credits the detailed record of his leadership achievements on the Triumph Track for distinguishing his college application. Our platform is more than recognition—it's a launchpad!</p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-indigo-500">
+                    <h3 class="text-xl font-semibold mb-2">School Board Highlights: KDA's New Recognition Platform</h3>
+                    <p class="text-gray-400 text-sm">October 15, 2025</p>
+                    <p class="mt-3">The KDA School Board officially endorsed the Triumph Track, citing its success in boosting school pride and community engagement. See the full press release linked below.</p>
+                </div>
+            </div>
+        </main>
+
+
+        <!-- --- 6. Admin Panel (ADMIN VIEW) --- -->
+        <main id="admin-view" class="view hidden">
+            <h2 class="text-3xl font-bold mb-6 text-yellow-400">Admin Panel: Achievement Manager</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Stats and Summary (Col 1) -->
+                <div class="lg:col-span-1 space-y-4">
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-xl">
+                        <p class="text-indigo-400 font-semibold">Total Achievements</p>
+                        <p id="totalAchievements" class="text-4xl font-extrabold mt-1">0</p>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-xl">
+                        <p class="text-indigo-400 font-semibold">Unique Students Recognized</p>
+                        <p id="uniqueStudents" class="text-4xl font-extrabold mt-1">0</p>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-xl">
+                        <p class="text-indigo-400 font-semibold">Most Active Category</p>
+                        <p id="mostActiveCategory" class="text-xl font-extrabold mt-2 text-green-400">Loading...</p>
+                    </div>
+                </div>
+
+                <!-- Add New Achievement Form (Col 2 & 3) -->
+                <div class="lg:col-span-2 bg-gray-800 p-8 rounded-2xl shadow-xl">
+                    <h3 class="text-2xl font-bold mb-6 text-indigo-400">Publish New Triumph</h3>
+                    <form id="addAchievementForm" onsubmit="event.preventDefault(); simulateAdminAdd();">
+                        <div class="mb-4">
+                            <label for="studentName" class="block text-gray-300 mb-2">Student Name</label>
+                            <input type="text" id="studentName" name="studentName" required class="w-full bg-gray-700 p-3 rounded-lg text-white border border-gray-600">
+                        </div>
+                        <div class="mb-4">
+                            <label for="title" class="block text-gray-300 mb-2">Achievement Title</label>
+                            <input type="text" id="title" name="title" required class="w-full bg-gray-700 p-3 rounded-lg text-white border border-gray-600">
+                        </div>
+                        <div class="mb-4">
+                            <label for="category" class="block text-gray-300 mb-2">Category</label>
+                            <select id="category" name="category" required class="w-full bg-gray-700 p-3 rounded-lg text-white border border-gray-600">
+                                <option value="" disabled selected>Select a Category</option>
+                                <option value="Academic">Academic</option>
+                                <option value="Sports">Sports</option>
+                                <option value="Arts">Arts</option>
+                                <option value="Leadership">Leadership</option>
+                            </select>
+                        </div>
+                        <div class="mb-6">
+                            <label for="details" class="block text-gray-300 mb-2">Details/Impact Story</label>
+                            <textarea id="details" name="details" rows="3" required class="w-full bg-gray-700 p-3 rounded-lg text-white border border-gray-600"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-yellow-500 text-gray-900 font-bold py-3 rounded-xl hover:bg-yellow-400 transition duration-300 shadow-md hover:shadow-lg">
+                            PUBLISH ACHIEVEMENT
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Admin Message Box -->
+    <div id="adminMessageBox" class="admin-message bg-green-500 text-white p-3 rounded-lg shadow-xl font-semibold">
+        Achievement successfully published!
+    </div>
+
+    <script>
+        // --- 7. Single Page Application (SPA) Logic ---
+
+        // Simulated Achievement Data Store
+        let achievementsData = [
+            { id: 101, studentId: 101, name: "Sarah Chen", grade: 11, category: "Academic", title: "National Robotics Championship (Gold)", date: "2025-10-20", details: "Designed an AI-powered sorting system, winning the national high school challenge. Her ingenuity secured a place in the international finals." },
+            { id: 102, studentId: 102, name: "Ethan Miller", grade: 12, category: "Sports", title: "State Track & Field (100m Record)", date: "2025-10-15", details: "Broke a 20-year school and state record. Dedication and intense training paid off for this powerhouse athlete." },
+            { id: 103, studentId: 103, name: "Leah Kims", grade: 10, category: "Arts", title: "Regional Visual Art Competition (1st Place)", date: "2025-10-10", details: "Her hyper-realistic digital painting, 'The Unseen City', captured the judge's attention for its masterful technique." },
+            { id: 104, studentId: 104, name: "Marcus Jones", grade: 9, category: "Leadership", title: "Junior Class President Election Win", date: "2025-10-05", details: "Won on a platform focused on sustainability and student voice, demonstrating exceptional charisma and organizational skills." },
+            { id: 105, studentId: 101, name: "Sarah Chen", grade: 11, category: "Academic", title: "Math Olympiad Top 5 Finish", date: "2025-09-28", details: "Continued academic success with a strong showing in the prestigious Math Olympiad competition." }
+        ];
+
+        let currentFilter = "";
+
+        /**
+         * Maps a category string to a Tailwind color class for visual consistency.
+         * @param {string} category
+         * @returns {string} Tailwind background class
+         */
+        const getCategoryColor = (category) => {
+            switch (category) {
+                case 'Academic': return 'bg-blue-600/20 text-blue-300 border-blue-600';
+                case 'Sports': return 'bg-green-600/20 text-green-300 border-green-600';
+                case 'Arts': return 'bg-orange-600/20 text-orange-300 border-orange-600';
+                case 'Leadership': return 'bg-purple-600/20 text-purple-300 border-purple-600';
+                default: return 'bg-gray-600/20 text-gray-300 border-gray-600';
+            }
+        };
+
+        /**
+         * Renders the achievement cards to the grid based on current filters and search.
+         */
+        const loadAchievements = () => {
+            const grid = document.getElementById('achievementGrid');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            const filteredData = achievementsData
+                .filter(a => currentFilter === "" || a.category === currentFilter)
+                .filter(a =>
+                    a.name.toLowerCase().includes(searchTerm) ||
+                    a.title.toLowerCase().includes(searchTerm) ||
+                    a.details.toLowerCase().includes(searchTerm) ||
+                    a.category.toLowerCase().includes(searchTerm)
+                )
+                .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by newest first
+
+            grid.innerHTML = ''; // Clear existing content
+
+            if (filteredData.length === 0) {
+                grid.innerHTML = `<p class="text-center text-xl text-gray-400 col-span-full py-10">No triumphs found matching your search. Try a different filter!</p>`;
+                return;
+            }
+
+            filteredData.forEach(achievement => {
+                const colorClass = getCategoryColor(achievement.category);
+                const card = document.createElement('div');
+                card.className = `achievement-card ${colorClass} p-5 rounded-2xl border-t-4 cursor-pointer hover:border-yellow-400`;
+                card.onclick = () => viewStudentProfile(achievement.studentId);
+
+                card.innerHTML = `
+                    <div class="flex items-center space-x-3 mb-3">
+                        <span class="text-xs font-semibold uppercase px-3 py-1 rounded-full ${colorClass.replace('bg-', 'bg-').replace('/20', '')} text-white">${achievement.category}</span>
+                        <span class="text-xs text-gray-400">${new Date(achievement.date).toLocaleDateString()}</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">${achievement.title}</h3>
+                    <p class="text-base font-semibold text-yellow-400 mb-3">${achievement.name} (Grade ${achievement.grade})</p>
+                    <p class="text-gray-300 text-sm line-clamp-2">${achievement.details}</p>
+                    <span class="text-indigo-400 text-sm mt-3 inline-block hover:text-indigo-300 transition duration-200">View Full Profile →</span>
+                `;
+                grid.appendChild(card);
+            });
+        };
+
+        /**
+         * Updates the filter and re-renders the achievements.
+         * @param {HTMLElement} buttonElement
+         */
+        const setFilter = (buttonElement) => {
+            // Remove active style from all buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active-filter', 'ring-2', 'ring-offset-2', 'ring-yellow-400', 'ring-offset-gray-900'));
+
+            // Set the new filter and add active style
+            currentFilter = buttonElement.getAttribute('data-filter');
+            buttonElement.classList.add('active-filter', 'ring-2', 'ring-offset-2', 'ring-yellow-400', 'ring-offset-gray-900');
+
+            loadAchievements();
+        };
+
+        /**
+         * Triggers achievement loading based on search input and current filter.
+         */
+        const filterAndSearch = () => {
+            loadAchievements();
+        };
+
+        /**
+         * Switches the active view (SPA navigation).
+         * @param {string} viewName - The ID of the view to show ('home', 'profile', 'gallery', 'news', 'admin')
+         */
+        const showView = (viewName) => {
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.add('hidden');
+            });
+
+            document.getElementById(`${viewName}-view`).classList.remove('hidden');
+
+            // Hide/Show Search section based on view
+            const filterSection = document.getElementById('filter-section');
+            if (viewName === 'home') {
+                filterSection.classList.remove('hidden');
+                loadAchievements(); // Ensure home content is refreshed
+            } else {
+                filterSection.classList.add('hidden');
+            }
+
+            if (viewName === 'admin') {
+                updateAdminStats();
+            }
+        };
+
+        /**
+         * Renders a simulated student profile view.
+         * @param {number} studentId - The ID of the student to display.
+         */
+        const viewStudentProfile = (studentId) => {
+            const studentAchievements = achievementsData.filter(a => a.studentId === studentId);
+            if (studentAchievements.length === 0) {
+                console.error("Student profile not found.");
+                return;
+            }
+
+            const student = studentAchievements[0];
+            showView('profile');
+
+            const profileContent = document.getElementById('profileContent');
+
+            // Collect unique achievement titles and group them
+            const groupedAchievements = studentAchievements.reduce((acc, current) => {
+                const key = current.category;
+                if (!acc[key]) {
+                    acc[key] = [];
+                }
+                acc[key].push(current);
+                return acc;
+            }, {});
+
+            let trophyShelf = '';
+            let profileHtml = `
+                <div class="text-center pb-6 border-b border-gray-700">
+                    <div class="mx-auto w-24 h-24 bg-indigo-600 rounded-full flex items-center justify-center text-4xl font-bold mb-3 border-4 border-yellow-400">
+                        ${student.name.charAt(0)}
+                    </div>
+                    <h2 class="text-4xl font-extrabold text-white">${student.name}</h2>
+                    <p class="text-xl text-indigo-400">Grade ${student.grade} | Hall of Honor Inductee</p>
+                    <p class="mt-4 italic text-gray-400">"The journey of a thousand miles begins with a single step of effort."</p>
+                </div>
+                <div class="mt-6">
+                    <h3 class="text-2xl font-bold mb-4 text-yellow-400">Trophy Shelf & Accomplishments</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            `;
+
+            // Build achievement listing
+            for (const category in groupedAchievements) {
+                const categoryColor = getCategoryColor(category);
+                profileHtml += `
+                    <div class="${categoryColor} p-4 rounded-xl border-t-4 border-yellow-400 shadow-md">
+                        <h4 class="font-bold text-lg mb-2">${category} Triumphs (${groupedAchievements[category].length})</h4>
+                        <ul class="list-disc list-inside space-y-1 text-gray-200 text-sm">
+                            ${groupedAchievements[category].map(a => `<li class="hover:text-white transition duration-200">${a.title} - ${new Date(a.date).toLocaleDateString()}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            profileHtml += `
+                    </div>
+                </div>
+            `;
+
+            profileContent.innerHTML = profileHtml;
+        };
+
+
+        // --- Admin Panel Logic ---
+
+        /**
+         * Calculates and displays administrative statistics.
+         */
+        const updateAdminStats = () => {
+            document.getElementById('totalAchievements').textContent = achievementsData.length;
+
+            const uniqueIds = new Set(achievementsData.map(a => a.studentId));
+            document.getElementById('uniqueStudents').textContent = uniqueIds.size;
+
+            const categoryCounts = achievementsData.reduce((acc, current) => {
+                acc[current.category] = (acc[current.category] || 0) + 1;
+                return acc;
+            }, {});
+
+            let mostActiveCategory = 'N/A';
+            let maxCount = 0;
+            for (const category in categoryCounts) {
+                if (categoryCounts[category] > maxCount) {
+                    maxCount = categoryCounts[category];
+                    mostActiveCategory = category;
+                }
+            }
+
+            document.getElementById('mostActiveCategory').textContent = mostActiveCategory;
+        };
+
+        /**
+         * Simulates adding a new achievement via the Admin Form.
+         */
+        const simulateAdminAdd = () => {
+            const form = document.getElementById('addAchievementForm');
+            const newId = Math.max(...achievementsData.map(a => a.id)) + 1;
+            const newStudentId = 999 + Math.floor(Math.random() * 100); // Simulate a new ID for the new student
+            const grade = 9 + Math.floor(Math.random() * 4); // Simulate a random grade
+
+            const newAchievement = {
+                id: newId,
+                studentId: newStudentId,
+                name: form.studentName.value,
+                grade: grade,
+                category: form.category.value,
+                title: form.title.value,
+                date: new Date().toISOString().split('T')[0], // Today's date
+                details: form.details.value
+            };
+
+            // 1. Add to the simulated database
+            achievementsData.push(newAchievement);
+            console.log("New Achievement Added:", newAchievement);
+
+            // 2. Show success message (using a custom message box instead of alert)
+            const msgBox = document.getElementById('adminMessageBox');
+            msgBox.textContent = `${newAchievement.name}'s triumph in ${newAchievement.category} was published!`;
+            msgBox.classList.remove('hidden');
+            msgBox.classList.add('block');
+
+            setTimeout(() => {
+                msgBox.classList.remove('block');
+                msgBox.classList.add('hidden');
+            }, 3000);
+
+            // 3. Update stats and clear form
+            updateAdminStats();
+            form.reset();
+
+            // 4. Navigate back to home to see the new achievement
+            showView('home');
+        };
+
+        // --- Initialization ---
+        window.onload = () => {
+            // Set the initial filter button to active
+            document.querySelector('.filter-btn[data-filter=""]').classList.add('ring-2', 'ring-offset-2', 'ring-yellow-400', 'ring-offset-gray-900');
+            // Load the initial view
+            showView('home');
+            // Calculate initial admin stats
+            updateAdminStats();
+        };
+
+    </script>
+</body>
+</html>
